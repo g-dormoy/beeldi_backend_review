@@ -1,0 +1,21 @@
+# Backend code review
+
+This following code has issue, the goal of the code review is to identify them and to provide clear comments on how to
+make it more maintainable and performant.
+
+This simple api serves the Beeldi dev directory in an API.
+
+## File descriptions
+main.ts contains the so called code to review
+developers.ts contains the developer database and must be considered as a database :D
+
+## Rules
+
+- Only the CTO and the Lead developer can access the full developer list
+- Only the CTO and the Lead developer can access another developer profile
+- Only the CTO and the Lead developer can create a developer
+- Only the CTO and the Lead developer can modify the role of other dev
+- The cto role can only be applied by the CTO
+- Each developer can access his profile
+- A username must be a word
+- Only the following roles can be applied ['cto', 'lead', 'dev', 'intern', apprentice]
