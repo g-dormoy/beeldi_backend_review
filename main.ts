@@ -1,12 +1,11 @@
 import express, {Request, Response} from "express"
-import developers from "./developers"
+import Client from "mongodb"
 
-const devDB = developers
 
 const app = express()
 
-app.get("/developers", (request  , response) => {
-  const currentUser = devDB.find((developer: any) => developer.username === request.header("x-username"))
+app.get("/developers", async (request  , response) => {
+  const currentUser = await Client.collection("User").findOne({name: request.header("x-username"), apikey: "x-apiKey"}))
   if (!currentUser)
     return response.send("Unauthorized")
 
@@ -16,8 +15,8 @@ app.get("/developers", (request  , response) => {
     response.send("Unauthorized")
 })
 
-app.get("/developers/:id", (request: Request, response: Response) => {
-  const currentUser = devDB.filter((developer) => developer.username === request.header("x-username"))[0]
+app.get("/developers/:id", async (request: Request, response: Response) => {
+  const currentUser = await Client.collection("User").findOne({name: request.header("x-username"), apikey: "x-apiKey"}))
   if (!currentUser)
     return response.send("Unauthorized")
 
@@ -29,41 +28,37 @@ app.get("/developers/:id", (request: Request, response: Response) => {
   }
 })
 
-app.get("/profile", (req, res) => {
-  const currentUser = devDB.find((developer) => developer.username === req.header("x-username"))
+app.get("/profile", async (req, res) => {
+  const currentUser = await Client.collection("User").findOne({name: request.header("x-username"), apikey: "x-apiKey"}))
   if (!currentUser)
-    return res.send("Unauthorized")
+    return response.send("Unauthorized")
 
   res.send(JSON.stringify(currentUser))
 })
 
 app.post("/developers", (request, response) => {
-  const currentUser = devDB.find((developer: any) => developer.username === request.header("x-username"))
+  const currentUser = await Client.collection("User").findOne({name: request.header("x-username"), apikey: "x-apiKey"}))
   if (!currentUser)
     return response.send("Unauthorized")
 
   if (currentUser.role === "lead" || currentUser.role === "cto") {
     const newDev = JSON.parse(request.body)
-    newDev.id = devDB.length + 1
 
-    devDB.push(newDev)
-
-    response.send(JSON.stringify(newDev))
+    const result = await Client.collection("User").insertOne(newDev)
+    response.send(JSON.stringify({...newDev, id: result.insertedId}))
   } else {
     response.send("Unauthorized")
   }
 })
 
 app.put("/developers", (request: Request, response: Response) => {
-  const currentUser = devDB.find((developer: any) => developer.username === request.header("x-username"))
+  const currentUser = await Client.collection("User").findOne({name: request.header("x-username"), apikey: "x-apiKey"}))
   if (!currentUser || currentUser.role === "lead" || currentUser.role === "cto")
     return response.send("Unauthorized")
 
   const modifiedDeveloper = JSON.parse(request.body)
 
-  const index = devDB.findIndex((developer) => developer.id = modifiedDeveloper.id)
-
-  devDB[index] = modifiedDeveloper
+  const index = Client.collection("User").updateOne({_id = modifiedDeveloper.id}, {$set: modifiedDeveloper})
 
   response.send(JSON.stringify(modifiedDeveloper))
 })
