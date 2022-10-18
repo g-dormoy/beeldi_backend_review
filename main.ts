@@ -21,7 +21,7 @@ app.get("/developers/:id", async (request: Request, response: Response) => {
     return response.send("Unauthorized")
 
   if (currentUser.role === "lead" || currentUser.role === "cto") {
-    const foundDeveloper = devDB.filter((developer) => developer.id === parseInt(request.params.id))
+    const foundDeveloper = Client.collection("User").findOne({_id: request.params.id})
     response.send(JSON.stringify(foundDeveloper))
   } else {
     response.send("unAuthorized")
