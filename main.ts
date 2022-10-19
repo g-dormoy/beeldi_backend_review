@@ -10,6 +10,7 @@ app.get("/developers", async (request  , response) => {
     return response.send("Unauthorized")
 
   if (currentUser.role === "lead" || currentUser.role === "cto")
+    const devs = await Client.collection("User").findAll()
     response.send(JSON.stringify(devDB))
   else
     response.send("Unauthorized")
